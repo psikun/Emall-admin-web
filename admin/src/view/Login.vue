@@ -33,32 +33,25 @@
           <el-button type="primary"
                      class="button"
                      size="large"
-                     @click="submitForm('loginForm')">登 录
-          </el-button>
+                     @click="submitForm('loginForm')">登 录</el-button>
         </el-form-item>
       </el-form>
     </div>
     <div class="footer">
       <div>MIT License Copyright (c) 2022 zchengo</div>
-      <div>
-        <el-divider direction="vertical"/>
-      </div>
+      <div><el-divider direction="vertical" /></div>
       <a href="https://github.com/zchengo/imall">Github</a>
-      <div>
-        <el-divider direction="vertical"/>
-      </div>
+      <div><el-divider direction="vertical" /></div>
       <a href="https://www.zhihu.com/people/87-4-8-5">Zhihu</a>
-      <div>
-        <el-divider direction="vertical"/>
-      </div>
+      <div><el-divider direction="vertical" /></div>
       <a href="#">About</a>
     </div>
   </div>
 </template>
 
 <script>
-import {ElMessage} from 'element-plus'
-import {CircleCheck, Lock, User} from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
+import { User, Lock, CircleCheck } from '@element-plus/icons-vue'
 
 export default {
   name: "Login",
@@ -90,10 +83,10 @@ export default {
     };
   },
   mounted() {
-    this.getCaptcha();
+    // this.getCaptcha();
   },
   updated() {
-    this.getCaptcha();
+    // this.getCaptcha();
   },
   methods: {
 
@@ -104,12 +97,13 @@ export default {
           this.$axios.post('auth/login', {
             username: this.loginForm.username,
             password: this.loginForm.password,
-            // captchaId: this.loginForm.captchaId,
-            // captchaValue: this.loginForm.captchaValue,
+            captchaId: this.loginForm.captchaId,
+            captchaValue: this.loginForm.captchaValue,
           }).then((response) => {
+            console.log(response)
             localStorage.setItem("token", response.data.data.token)
             localStorage.setItem("sid", response.data.data.user)
-            ElMessage({message: '欢迎回来' + response.data.data.user, type: 'success'})
+            ElMessage({ message: '欢迎回来'+response.data.data.user, type: 'success'})
             this.$router.push('/category');
           }).catch((error) => {
             console.log(error);
@@ -118,6 +112,12 @@ export default {
       });
       // this.getCaptcha();
     },
+    getUserInfo() {
+      this.$axios.get('/auth/info').then(response => {
+        localStorage.setItem("sid", response.data.data.username)
+        console.log(response.data.data)
+      })
+    }
 
     // 获取验证码
     // getCaptcha() {
@@ -142,7 +142,6 @@ export default {
   /* background-color: #e8ecf1; */
   background-color: #F5F7FA;
 }
-
 .form {
   width: 25%;
   height: 50%;
@@ -153,7 +152,6 @@ export default {
   border-radius: 15px;
   box-shadow: 0px 0px 1px #F2F6FC;
 }
-
 .logo {
   width: 80px;
   height: 80px;
@@ -161,7 +159,6 @@ export default {
   border-radius: 15px;
   box-shadow: 0px 0px 12px #ebeff4;
 }
-
 .captchaImg {
   width: 45%;
   height: 40px;
@@ -170,13 +167,12 @@ export default {
   border-radius: 5px;
   background-color: #ecf5ff;
 }
-
 .button {
   width: 100%;
   margin-top: 5px;
 }
 
-.footer {
+.footer{
   bottom: 0;
   width: 100%;
   height: 80px;
@@ -188,11 +184,10 @@ export default {
   font-size: 10px;
 }
 
-.footer a {
+.footer a{
   color: #606266;
 }
-
-.footer a:hover {
+.footer a:hover{
   color: #2d2d2f;
   transition: 0.5s;
 }

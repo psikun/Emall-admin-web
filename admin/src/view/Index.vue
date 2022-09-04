@@ -38,17 +38,17 @@
               <el-row :gutter="12">
                 <el-col :span="6">
                   <links title="添加商品" bgColor="#79bbff" to="goods"
-                    ><Plus
+                  ><Plus
                   /></links>
                 </el-col>
                 <el-col :span="6">
                   <links title="订单管理" bgColor="#eebe77" to="order"
-                    ><Document
+                  ><Document
                   /></links>
                 </el-col>
                 <el-col :span="6">
                   <links title="活动管理" bgColor="#95d475" to="market"
-                    ><ShoppingCart
+                  ><ShoppingCart
                   /></links>
                 </el-col>
                 <el-col :span="6">
@@ -99,130 +99,130 @@ export default {
     let orderDataOption;
     let shopDataOption;
     this.$axios
-      .get("/order/data", {
-        params: {
-          sid: localStorage.getItem("sid"),
-        },
-      })
-      .then((response) => {
-        console.log(response);
-        orderDataOption = {
-          title: {
-            text: "订单数据（当日各时段）",
-            textStyle: {
-              fontSize: "16px",
-              fontWeight: "normal",
-            },
+        .get("/order/data", {
+          params: {
+            sid: localStorage.getItem("sid"),
           },
-          xAxis: {
-            type: "category",
-            data: [
-              "06",
-              "07",
-              "08",
-              "09",
-              "10",
-              "11",
-              "12",
-              "13",
-              "14",
-              "15",
-              "16",
-              "17",
-              "18",
-              "19",
-              "20",
-              "21",
-              "22",
-              "23",
-              "24",
-            ],
-          },
-          yAxis: {
-            type: "value",
-          },
-          grid: {
-            left: "3%",
-            right: "4%",
-            bottom: "3%",
-            containLabel: true,
-          },
-          series: [
-            { 
-              name: "订单数",
-              data: response.data.data.orders,
-              type: "bar",
-            },
-          ],
-          tooltip: {
-            trigger: "axis",
-            axisPointer: {
-              type: "shadow",
-            },
-          },
-        };
-        orderDataOption && orderData.setOption(orderDataOption);
-      });
-
-    this.$axios
-      .get("/shop/data", {
-        params: {
-          sid: localStorage.getItem("sid"),
-        },
-      })
-      .then((response) => {
-        console.log(response);
-        shopDataOption = {
-          title: {
-            text: "店铺数据",
-            textStyle: {
-              fontSize: "16px",
-              fontWeight: "normal",
-            },
-          },
-          tooltip: {
-            trigger: "axis",
-            axisPointer: {
-              type: "cross",
-              label: {
-                backgroundColor: "#6a7985",
+        })
+        .then((response) => {
+          console.log(response);
+          orderDataOption = {
+            title: {
+              text: "订单数据（当日各时段）",
+              textStyle: {
+                fontSize: "16px",
+                fontWeight: "normal",
               },
             },
-          },
-          grid: {
-            left: "3%",
-            right: "4%",
-            bottom: "10%",
-            containLabel: true,
-          },
-          xAxis: [
-            { 
+            xAxis: {
               type: "category",
-              boundaryGap: false,
-              data: ["周一", "周二", "周三", "周四", "周五", "周六", "周日"],
+              data: [
+                "06",
+                "07",
+                "08",
+                "09",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "20",
+                "21",
+                "22",
+                "23",
+                "24",
+              ],
             },
-          ],
-          yAxis: [
-            {
+            yAxis: {
               type: "value",
             },
-          ],
-          series: [
-            {
-              name: "支付金额",
-              type: "line",
-              stack: "Total",
-              areaStyle: {},
-              emphasis: {
-                focus: "series",
-              },
-              smooth: true,
-              data: response.data.data.amount,
+            grid: {
+              left: "3%",
+              right: "4%",
+              bottom: "3%",
+              containLabel: true,
             },
-          ],
-        };
-        shopDataOption && shopData.setOption(shopDataOption);
-      });
+            series: [
+              {
+                name: "订单数",
+                data: response.data.data.orders,
+                type: "bar",
+              },
+            ],
+            tooltip: {
+              trigger: "axis",
+              axisPointer: {
+                type: "shadow",
+              },
+            },
+          };
+          orderDataOption && orderData.setOption(orderDataOption);
+        });
+
+    this.$axios
+        .get("/shop/data", {
+          params: {
+            sid: localStorage.getItem("sid"),
+          },
+        })
+        .then((response) => {
+          console.log(response);
+          shopDataOption = {
+            title: {
+              text: "店铺数据",
+              textStyle: {
+                fontSize: "16px",
+                fontWeight: "normal",
+              },
+            },
+            tooltip: {
+              trigger: "axis",
+              axisPointer: {
+                type: "cross",
+                label: {
+                  backgroundColor: "#6a7985",
+                },
+              },
+            },
+            grid: {
+              left: "3%",
+              right: "4%",
+              bottom: "10%",
+              containLabel: true,
+            },
+            xAxis: [
+              {
+                type: "category",
+                boundaryGap: false,
+                data: ["周一", "周二", "周三", "周四", "周五", "周六", "周日"],
+              },
+            ],
+            yAxis: [
+              {
+                type: "value",
+              },
+            ],
+            series: [
+              {
+                name: "支付金额",
+                type: "line",
+                stack: "Total",
+                areaStyle: {},
+                emphasis: {
+                  focus: "series",
+                },
+                smooth: true,
+                data: response.data.data.amount,
+              },
+            ],
+          };
+          shopDataOption && shopData.setOption(shopDataOption);
+        });
   },
   methods: {
     // 获取订单数据

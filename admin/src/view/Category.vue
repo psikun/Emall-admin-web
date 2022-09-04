@@ -221,7 +221,7 @@ export default {
     // 确定添加、编辑类目
     confirmCategory(){
       if (this.operateType === 'add'){
-        this.$axios.post('/category/create', {
+        this.$axios.post('/category/add', {
           name: this.category.name,
           parentId: this.category.parentId,
           level: this.category.level,
