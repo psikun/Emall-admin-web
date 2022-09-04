@@ -226,22 +226,22 @@ export default {
   },
   methods: {
     // 获取订单数据
-    getTodayData() {
-      this.$axios
-        .get("/today/data", {
-          params: {
-            sid: localStorage.getItem("sid"),
-          },
-        })
-        .then((response) => {
-          this.pendPay = response.data.data.pendPay;
-          this.payed = response.data.data.payed;
-          this.inDelivery = response.data.data.inDelivery;
-          this.canceled = response.data.data.canceled;
-          this.finished = response.data.data.finished;
-          this.payAmount = response.data.data.payAmount;
-        });
-    },
+    // getTodayData() {
+    //   this.$axios
+    //     .get("/today/data", {
+    //       params: {
+    //         sid: localStorage.getItem("sid"),
+    //       },
+    //     })
+    //     .then((response) => {
+    //       this.pendPay = response.data.data.pendPay;
+    //       this.payed = response.data.data.payed;
+    //       this.inDelivery = response.data.data.inDelivery;
+    //       this.canceled = response.data.data.canceled;
+    //       this.finished = response.data.data.finished;
+    //       this.payAmount = response.data.data.payAmount;
+    //     });
+    // },
   },
 };
 </script>
