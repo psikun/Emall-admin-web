@@ -156,7 +156,7 @@ export default {
         city: '',
         district: '',
         detailedAddress: '',
-        created: '',
+        createTime: '',
         nickName: ''
       },
       dialogTitle: '',
@@ -193,7 +193,7 @@ export default {
 
     // 获取订单列表
     getOrderList(){
-      this.$axios.get('/order/list', {
+      this.$axios.get('/order', {
         params: {
           id: this.query.id,
           status: this.query.status,

@@ -196,11 +196,14 @@ export default {
       this.checkLv2CategoryDialogVisible = true
     },
 
+
     // 获取类目列表
     getCategoryList(parentId){
-      this.$axios.get('/category/list', {
+      this.$axios.get('/category', {
         params: {
           name: this.query.name,
+          pageNum: 1,
+          pageSize: 1,
           parentId: parentId,
           sid: localStorage.getItem('sid')
         }
