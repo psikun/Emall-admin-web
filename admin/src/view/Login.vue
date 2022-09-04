@@ -20,14 +20,7 @@
                     :prefix-icon="Lock"/>
         </el-form-item>
         <el-form-item prop="captchaValue">
-          <div style="display: inline-flex;">
-            <el-input v-model="loginForm.captchaValue"
-                      :prefix-icon="CircleCheck"
-                      size="large"
-                      style="width: 50%;"
-                      maxlength="5"/>
-            <el-image :src="captchaImg" class="captchaImg" @click="getCaptcha"/>
-          </div>
+
         </el-form-item>
         <el-form-item>
           <el-button type="primary"
@@ -37,15 +30,7 @@
         </el-form-item>
       </el-form>
     </div>
-    <div class="footer">
-      <div>MIT License Copyright (c) 2022 zchengo</div>
-      <div><el-divider direction="vertical" /></div>
-      <a href="https://github.com/zchengo/imall">Github</a>
-      <div><el-divider direction="vertical" /></div>
-      <a href="https://www.zhihu.com/people/87-4-8-5">Zhihu</a>
-      <div><el-divider direction="vertical" /></div>
-      <a href="#">About</a>
-    </div>
+
   </div>
 </template>
 

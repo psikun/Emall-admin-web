@@ -26,35 +26,35 @@
     </el-form>
     <!-- 商品列表 -->
     <el-table :data="goodsList" height="65vh" style="width: 100%;">
-      <el-table-column prop="name" label="商品名称" min-width="240">
+      <el-table-column prop="id" label="商品id" sortable/>
+      <el-table-column prop="name" label="商品名称" min-width="160">
         <template #default="scope">
           <div style="display: inline-flex;">
-            <div class="goods_image_box">
-              <el-image class="goods_image" :src="scope.row.imageUrl"/>
-            </div>
+            <!--            <div class="goods_image_box">-->
+            <!--              <el-image class="goods_image" :src="scope.row.imageUrl"/>-->
+            <!--            </div>-->
             <div style="display: block;">
-              <div class="goods_title">{{ scope.row.title }}</div>
-              <div class="goods_id">ID：{{ scope.row.id }}</div>
+              <div class="goods_title">{{ scope.row.name }}</div>
             </div>
           </div>
         </template>
       </el-table-column>
       <el-table-column prop="price" label="价格" sortable/>
-      <el-table-column prop="quantity" label="库存"/>
+      <el-table-column prop="discount" label="折扣" sortable/>
       <el-table-column prop="sales" label="销量" sortable/>
-      <el-table-column prop="status" label="状态">
+      <el-table-column prop="deleted" label="状态">
         <template #default="scope">
-          <el-tag v-if="scope.row.status === 1" size="small">出售中</el-tag>
-          <el-tag v-if="scope.row.status === 2" size="small" type="success">仓库中</el-tag>
+          <el-tag v-if="scope.row.deleted === 0" size="small">已上架</el-tag>
+          <el-tag v-if="scope.row.deleted === 1" size="small" type="success">已下架</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="created" label="创建时间" min-width="150" sortable>
+      <el-table-column prop="createTime" label="创建时间" min-width="150" sortable>
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <el-icon>
               <timer/>
             </el-icon>
-            <span style="margin-left: 10px">{{ scope.row.created }}</span>
+            <span style="margin-left: 10px">{{ scope.row.createTime }}</span>
           </div>
         </template>
       </el-table-column>
@@ -72,25 +72,25 @@
                          :icon="WarningFilled"
                          @confirm="deleteGoods(scope.row)">
             <template #reference>
-             <el-button size="small" type="danger" :icon="Delete"/>
+              <el-button size="small" type="danger" :icon="Delete"/>
             </template>
           </el-popconfirm>
         </template>
       </el-table-column>
       <template #empty>
         <div style="margin: 50px 0;">
-          <el-empty v-if="showEmpty" description="暂时还没有商品哦" />
+          <el-empty v-if="showEmpty" description="暂时还没有商品哦"/>
         </div>
       </template>
     </el-table>
     <div style="padding: 15px 0;">
       <el-pagination layout="total, prev, pager, next"
-                   :current-page="pageNum"
-                   :page-size="pageSize"
-                   :total="total"
-                   @current-change="handleCurrentChange"
-                   @prev-click="handleCurrentChangePrev"
-                   @next-click="handleCurrentChangeNext" background/>
+                     :current-page="pageNum"
+                     :page-size="pageSize"
+                     :total="total"
+                     @current-change="handleCurrentChange"
+                     @prev-click="handleCurrentChangePrev"
+                     @next-click="handleCurrentChangeNext" background/>
     </div>
     <!-- 添加、编辑商品，通用对话框 -->
     <el-dialog :title="dialogTitle" v-model="goodsDialogVisible" :lock-scroll="false" top="5vh" width="45%" @close="cancel">
@@ -117,21 +117,6 @@
           <el-input v-model.number="goods.quantity" style="width: 50%;">
             <template #append>件</template>
           </el-input>
-        </el-form-item>
-        <el-form-item label="图片" prop="imageUrl">
-          <el-input v-show="false" v-model="goods.imageUrl" />
-          <el-upload
-              action="http://localhost:8000/web/upload"
-              :headers="{'token': token}"
-              :limit="1"
-              name="file"
-              :file-list="pictureList"
-              list-type="picture-card"
-              :on-preview="handleImagePreview"
-              :on-remove="handleImageRemove"
-              :on-success="handleImageSuccess">
-            <div class="goods_image_upload_icon">+</div>
-          </el-upload>
         </el-form-item>
         <el-form-item label="备注">
           <el-input v-model="goods.remark"
@@ -185,19 +170,28 @@ export default {
         title: '',
         name: '',
         price: '',
-        quantity: '',
+        discount: '',
         imageUrl: '',
         remark: '',
-        status: ''
+        deleted: '',
+        createTime: ''
       },
 
       rules: {
-        categoryId: { required: true, message: '请选择一个类目', trigger: 'blur' },
-        title: { required: true, message: '请输入一个标题', trigger: 'blur' },
-        name: { required: true, message: '请输入一个名称', trigger: 'blur' },
-        price: [ {required: true, message: '价格不能为空', trigger: 'blur' },{type: 'number',message: '价格必须为数字', trigger: 'blur'}],
-        quantity: [ {required: true, message: '价格不能为空', trigger: 'blur' },{type: 'number',message: '价格必须为数字', trigger: 'blur'}],
-        imageUrl: { required: true, message: '至少上传一张图片', trigger: 'blur' },
+        categoryId: {required: true, message: '请选择一个类目', trigger: 'blur'},
+        title: {required: true, message: '请输入一个标题', trigger: 'blur'},
+        name: {required: true, message: '请输入一个名称', trigger: 'blur'},
+        price: [{required: true, message: '价格不能为空', trigger: 'blur'}, {
+          type: 'number',
+          message: '价格必须为数字',
+          trigger: 'blur'
+        }],
+        quantity: [{required: true, message: '价格不能为空', trigger: 'blur'}, {
+          type: 'number',
+          message: '价格必须为数字',
+          trigger: 'blur'
+        }],
+
       },
 
       // 图片列表
@@ -283,8 +277,9 @@ export default {
 
     // 获取商品类目选项
     getCategoryOption() {
-      this.$axios.get('/category/option').then((response) => {
-        this.categoryOption = response.data.data;
+      this.$axios.get('/category').then((response) => {
+        console.log(response.data.data);
+        this.categoryOption = response.data.data.name;
       }).catch((error) => {
         console.log(error)
       })
@@ -292,10 +287,10 @@ export default {
 
     // 获取商品列表
     getGoodsList() {
-      this.$axios.get('/goods/list', {
+      this.$axios.get('/goods', {
         params: {
           id: this.query.id,
-          title: this.query.title,
+          title: this.query.name,
           categoryId: this.query.categoryId[1],
           status: this.query.status,
           pageNum: this.pageNum,
@@ -305,6 +300,7 @@ export default {
       }).then((response) => {
         this.total = response.data.data.total;
         this.goodsList = response.data.data.list;
+        console.log(this.goodsList)
         if (this.goodsList.length === 0) {
           this.showEmpty = true
         }
@@ -375,16 +371,16 @@ export default {
     // 删除商品
     deleteGoods(row) {
       this.$axios.delete('/goods/delete', {
-          params: {
-            id: row.id
-          }
-        }).then((response) => {
-          if (response.data.code === 200) {
-            ElMessage({message: response.data.message, type: 'success'})
-          }
-          this.getGoodsList()
-        }).catch((error) => {
-          console.log(error)
+        params: {
+          id: row.id
+        }
+      }).then((response) => {
+        if (response.data.code === 200) {
+          ElMessage({message: response.data.message, type: 'success'})
+        }
+        this.getGoodsList()
+      }).catch((error) => {
+        console.log(error)
       })
     },
 
@@ -392,9 +388,14 @@ export default {
     resetForm(formName) {
       this.$refs[formName].resetFields()
       switch (formName) {
-        case 'query': this.getGoodsList(); break;
-        case 'ruleForm': this.empty(); break;
-        default: console.log('invalid resetForm');
+        case 'query':
+          this.getGoodsList();
+          break;
+        case 'ruleForm':
+          this.empty();
+          break;
+        default:
+          console.log('invalid resetForm');
       }
     },
 
@@ -418,7 +419,8 @@ export default {
       this.goods.status = ''
       this.operateType = ''
       this.pictureList = []
-    }
+    },
+
   }
 }
 </script>
@@ -458,11 +460,12 @@ export default {
   align-items: center;
   justify-content: center;
 }
+
 .el-dialog {
-    border-radius: 10px !important;
+  border-radius: 10px !important;
 }
 
-.el-upload{
+.el-upload {
   width: 100px;
   height: 100px;
   line-height: 100px;
@@ -474,21 +477,21 @@ export default {
   border: none;
 }
 
-.el-upload--picture-card{
+.el-upload--picture-card {
   width: 100px;
   height: 100px;
   margin-top: 0;
   font-size: 16px !important;
 }
 
-.el-upload-list--picture-card .el-upload-list__item{
+.el-upload-list--picture-card .el-upload-list__item {
   width: 100px;
   height: 100px;
   line-height: 100px;
   font-size: 16px;
 }
 
-.el-upload-list--picture-card .el-upload-list__item-thumbnail{
+.el-upload-list--picture-card .el-upload-list__item-thumbnail {
   width: 100px;
   height: 100px;
   line-height: 100px;
