@@ -121,11 +121,12 @@ export default {
   width: 100%;
   height: 100vh;
   display: flex;
-  background-image: url("../assets/back.png");
-  background-size: 100% 60%;
+  background-image: url("../assets/back.jpg");
+  background-size: 100% 100%;
   background-repeat: no-repeat;
   /* background-color: #e8ecf1; */
-  background-color: #F5F7FA;
+  background-color: #4a8ae3;
+
 }
 .form {
   width: 25%;
@@ -133,9 +134,11 @@ export default {
   margin: 150px auto;
   text-align: center;
   padding: 20px;
-  background-color: white;
   border-radius: 15px;
   box-shadow: 0px 0px 1px #F2F6FC;
+  background-color: #FFDEE9;
+  background-image: linear-gradient(0deg, #FFDEE9 0%, #B5FFFC 100%);
+
 }
 .logo {
   width: 80px;

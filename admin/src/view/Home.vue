@@ -3,7 +3,7 @@
     <el-aside class="aside" width="110px">
       <div class="logo">
         <img src="../assets/logo.png" style=""/>
-        <div class="logo_name">iM</div>
+        <div class="logo_name">EMall</div>
       </div>
       <el-menu :default-active="defaultActive"
            background-color="#1b273f"
@@ -177,6 +177,7 @@ export default {
 </script>
 
 <style scoped>
+
 .container {
   height: 100vh;
   background-color: #e8ecf1;
@@ -238,7 +239,8 @@ export default {
   display: flex;
   padding: 0;
   border-bottom: 1px solid #f0f2f4;
-  background-color: #FFFFFF;
+  background-color: #74EBD5;
+  background-image: linear-gradient(90deg, #74EBD5 0%, #9FACE6 100%);
 }
 
 .navbar {
