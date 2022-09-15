@@ -38,21 +38,29 @@
               <el-row :gutter="12">
                 <el-col :span="6">
                   <links title="添加商品" bgColor="#79bbff" to="goods"
-                  ><Plus
-                  /></links>
+                  >
+                    <Plus
+                    />
+                  </links>
                 </el-col>
                 <el-col :span="6">
                   <links title="订单管理" bgColor="#eebe77" to="order"
-                  ><Document
-                  /></links>
+                  >
+                    <Document
+                    />
+                  </links>
                 </el-col>
                 <el-col :span="6">
                   <links title="活动管理" bgColor="#95d475" to="market"
-                  ><ShoppingCart
-                  /></links>
+                  >
+                    <ShoppingCart
+                    />
+                  </links>
                 </el-col>
                 <el-col :span="6">
-                  <links title="全部功能" bgColor="#f89898"><Menu /></links>
+                  <links title="全部功能" bgColor="#f89898">
+                    <Menu/>
+                  </links>
                 </el-col>
               </el-row>
             </el-card>
@@ -73,24 +81,27 @@
 <script>
 import card from "@/components/card";
 import links from "@/components/links";
-import { Plus, Document, ShoppingCart, Menu } from "@element-plus/icons-vue";
+import {Document, Menu, Plus, ShoppingCart} from "@element-plus/icons-vue";
 
 import * as echarts from "echarts";
+
 export default {
   name: "Index",
-  components: { card, links, Plus, Document, ShoppingCart, Menu },
+  components: {card, links, Plus, Document, ShoppingCart, Menu},
   data() {
     return {
-      pendPay: 0,
-      payed: 0,
-      inDelivery: 0,
-      canceled: 0,
-      finished: 0,
-      payAmount: 0.0,
+      pendPay: 26,
+      payed: 65,
+      inDelivery: 91,
+      canceled: 3,
+      finished: 108,
+      payAmount: 10086.0,
+      amount: [2668.6, 4150.5, 3050.6, 4905.5, 5509, 3065, 3935],
+      orders: [5,12,15,32,10,4,2,78,95,32,15,26,32,15,46,98,50,13,36]
     };
   },
   mounted() {
-    this.getTodayData();
+    // this.getTodayData();
     // 本周数据总览
     let orderData = echarts.init(document.getElementById("orderData"), null);
     let shopData = echarts.init(document.getElementById("shopData"), null, {
@@ -98,131 +109,112 @@ export default {
     });
     let orderDataOption;
     let shopDataOption;
-    this.$axios
-        .get("/order/data", {
-          params: {
-            sid: localStorage.getItem("sid"),
+    orderDataOption = {
+      title: {
+        text: "订单数据（当日各时段）",
+        textStyle: {
+          fontSize: "16px",
+          fontWeight: "normal",
+        },
+      },
+      xAxis: {
+        type: "category",
+        data: [
+          "06",
+          "07",
+          "08",
+          "09",
+          "10",
+          "11",
+          "12",
+          "13",
+          "14",
+          "15",
+          "16",
+          "17",
+          "18",
+          "19",
+          "20",
+          "21",
+          "22",
+          "23",
+          "24",
+        ],
+      },
+      yAxis: {
+        type: "value",
+      },
+      grid: {
+        left: "3%",
+        right: "4%",
+        bottom: "3%",
+        containLabel: true,
+      },
+      series: [
+        {
+          name: "订单数",
+          data: this.orders,
+          type: "bar",
+        },
+      ],
+      tooltip: {
+        trigger: "axis",
+        axisPointer: {
+          type: "shadow",
+        },
+      },
+    };
+    orderDataOption && orderData.setOption(orderDataOption);
+    shopDataOption = {
+      title: {
+        text: "店铺数据",
+        textStyle: {
+          fontSize: "16px",
+          fontWeight: "normal",
+        },
+      },
+      tooltip: {
+        trigger: "axis",
+        axisPointer: {
+          type: "cross",
+          label: {
+            backgroundColor: "#6a7985",
           },
-        })
-        .then((response) => {
-          console.log(response);
-          orderDataOption = {
-            title: {
-              text: "订单数据（当日各时段）",
-              textStyle: {
-                fontSize: "16px",
-                fontWeight: "normal",
-              },
-            },
-            xAxis: {
-              type: "category",
-              data: [
-                "06",
-                "07",
-                "08",
-                "09",
-                "10",
-                "11",
-                "12",
-                "13",
-                "14",
-                "15",
-                "16",
-                "17",
-                "18",
-                "19",
-                "20",
-                "21",
-                "22",
-                "23",
-                "24",
-              ],
-            },
-            yAxis: {
-              type: "value",
-            },
-            grid: {
-              left: "3%",
-              right: "4%",
-              bottom: "3%",
-              containLabel: true,
-            },
-            series: [
-              {
-                name: "订单数",
-                data: response.data.data.orders,
-                type: "bar",
-              },
-            ],
-            tooltip: {
-              trigger: "axis",
-              axisPointer: {
-                type: "shadow",
-              },
-            },
-          };
-          orderDataOption && orderData.setOption(orderDataOption);
-        });
-
-    this.$axios
-        .get("/shop/data", {
-          params: {
-            sid: localStorage.getItem("sid"),
+        },
+      },
+      grid: {
+        left: "3%",
+        right: "4%",
+        bottom: "10%",
+        containLabel: true,
+      },
+      xAxis: [
+        {
+          type: "category",
+          boundaryGap: false,
+          data: ["周一", "周二", "周三", "周四", "周五", "周六", "周日"],
+        },
+      ],
+      yAxis: [
+        {
+          type: "value",
+        },
+      ],
+      series: [
+        {
+          name: "支付金额",
+          type: "line",
+          stack: "Total",
+          areaStyle: {},
+          emphasis: {
+            focus: "series",
           },
-        })
-        .then((response) => {
-          console.log(response);
-          shopDataOption = {
-            title: {
-              text: "店铺数据",
-              textStyle: {
-                fontSize: "16px",
-                fontWeight: "normal",
-              },
-            },
-            tooltip: {
-              trigger: "axis",
-              axisPointer: {
-                type: "cross",
-                label: {
-                  backgroundColor: "#6a7985",
-                },
-              },
-            },
-            grid: {
-              left: "3%",
-              right: "4%",
-              bottom: "10%",
-              containLabel: true,
-            },
-            xAxis: [
-              {
-                type: "category",
-                boundaryGap: false,
-                data: ["周一", "周二", "周三", "周四", "周五", "周六", "周日"],
-              },
-            ],
-            yAxis: [
-              {
-                type: "value",
-              },
-            ],
-            series: [
-              {
-                name: "支付金额",
-                type: "line",
-                stack: "Total",
-                areaStyle: {},
-                emphasis: {
-                  focus: "series",
-                },
-                smooth: true,
-                data: response.data.data.amount,
-              },
-            ],
-          };
-          shopDataOption && shopData.setOption(shopDataOption);
-        });
+          smooth: true,
+          data: this.amount,
+        },
+      ],
+    };
+    shopDataOption && shopData.setOption(shopDataOption);
   },
   methods: {
     // 获取订单数据
