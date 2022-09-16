@@ -5,13 +5,6 @@
       <el-form-item prop="id">
         <el-input v-model.number="query.id" placeholder="商品ID"/>
       </el-form-item>
-      <el-form-item prop="title">
-        <el-input v-model="query.title" placeholder="商品标题"/>
-      </el-form-item>
-      <el-form-item prop="categoryId">
-        <el-cascader v-model="query.categoryId"
-                     :options="categoryOption" @focus="getCategoryOption" placeholder="请选择" clearable/>
-      </el-form-item>
       <el-form-item prop="status">
         <el-select v-model="query.status" placeholder="商品状态">
           <el-option label="已上架" value="1"></el-option>
@@ -48,6 +41,8 @@
           <el-tag v-if="scope.row.deleted === 1" size="small" type="success">已下架</el-tag>
         </template>
       </el-table-column>
+      <el-table-column prop="categoryId" label="类目" sortable/>
+
       <el-table-column prop="createTime" label="创建时间" min-width="150" sortable>
         <template #default="scope">
           <div style="display: flex; align-items: center">
@@ -96,15 +91,22 @@
     <el-dialog :title="dialogTitle" v-model="goodsDialogVisible" :lock-scroll="false" top="5vh" width="45%" @close="cancel">
       <el-form ref="ruleForm" :rules="rules" :model="goods" label-width="80px">
         <el-form-item label="类目" prop="categoryId">
-          <el-cascader v-model="goods.categoryId"
-                       :options="categoryOption"
-                       @change="changeCategory"
-                       change-on-select
-                       @focus="getCategoryOption" placeholder="请选择" clearable/>
+          <el-select
+              size="small"
+              v-model="goods.categoryId" ct
+              placeholder="请选择"
+              @change="addCatagory"
+              clearable>
+            <el-option
+              v-for="item in option"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+              >
+            </el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item label="标题" prop="title">
-          <el-input v-model="goods.title" style="width: 90%;" type="text" maxlength="30" show-word-limit/>
-        </el-form-item>
+
         <el-form-item label="名称" prop="name">
           <el-input v-model="goods.name" style="width: 50%;" type="text" maxlength="10" show-word-limit/>
         </el-form-item>
@@ -113,8 +115,8 @@
             <template #append>元</template>
           </el-input>
         </el-form-item>
-        <el-form-item label="数量" prop="quantity">
-          <el-input v-model.number="goods.quantity" style="width: 50%;">
+        <el-form-item label="销量" prop="sales">
+          <el-input v-model.number="goods.sales" style="width: 50%;">
             <template #append>件</template>
           </el-input>
         </el-form-item>
@@ -154,7 +156,6 @@ export default {
       // 查询条件
       query: {
         id: '',
-        title: '',
         categoryId: '',
         status: ''
       },
@@ -162,14 +163,26 @@ export default {
       // 类目选项
       categoryOption: [],
 
+      option: [
+        {
+          value:"01",
+          label:"一级父类",
+        },
+        {
+          value:"02",
+          label:"二级父类"
+        }
+      ],
+
+
       // 商品
       goodsList: [],
       goods: {
         id: '',
         categoryId: '',
-        title: '',
         name: '',
         price: '',
+        sales: '',
         discount: '',
         imageUrl: '',
         remark: '',
@@ -179,16 +192,15 @@ export default {
 
       rules: {
         categoryId: {required: true, message: '请选择一个类目', trigger: 'blur'},
-        title: {required: true, message: '请输入一个标题', trigger: 'blur'},
         name: {required: true, message: '请输入一个名称', trigger: 'blur'},
         price: [{required: true, message: '价格不能为空', trigger: 'blur'}, {
           type: 'number',
           message: '价格必须为数字',
           trigger: 'blur'
         }],
-        quantity: [{required: true, message: '价格不能为空', trigger: 'blur'}, {
+        sales: [{required: true, message: '数量不能为空', trigger: 'blur'}, {
           type: 'number',
-          message: '价格必须为数字',
+          message: '数量必须为数字',
           trigger: 'blur'
         }],
 
@@ -260,10 +272,9 @@ export default {
       this.operateType = 'edit'
       this.goods.id = row.id
       this.goods.categoryId = row.categoryId
-      this.goods.title = row.title
       this.goods.name = row.name
       this.goods.price = row.price
-      this.goods.quantity = row.quantity
+      this.goods.sales = row.sales
       this.goods.imageUrl = row.imageUrl
       this.pictureList.push({url: row.imageUrl})
       this.goods.remark = row.remark
@@ -275,22 +286,15 @@ export default {
       this.goods.categoryId = value[1]
     },
 
-    // 获取商品类目选项
-    getCategoryOption() {
-      this.$axios.get('/category').then((response) => {
-        console.log(response.data.data);
-        this.categoryOption = response.data.data.name;
-      }).catch((error) => {
-        console.log(error)
-      })
-    },
 
+    addCatagory(){
+      console.log("种类:",this.goods.categoryId);
+    },
     // 获取商品列表
     getGoodsList() {
       this.$axios.get('/goods', {
         params: {
           id: this.query.id,
-          title: this.query.name,
           categoryId: this.query.categoryId[1],
           status: this.query.status,
           pageNum: this.pageNum,
@@ -331,12 +335,11 @@ export default {
         if (valid) {
           if (this.operateType === 'add') {
             // 添加商品
-            this.$axios.post('/goods/create', {
+            this.$axios.post('/goods/add', {
               categoryId: parseInt(this.goods.categoryId),
-              title: this.goods.title,
               name: this.goods.name,
               price: parseInt(this.goods.price),
-              quantity: parseInt(this.goods.quantity),
+              sales: parseInt(this.goods.sales),
               imageUrl: this.goods.imageUrl,
               remark: this.goods.remark,
               sid: parseInt(localStorage.getItem('sid'))
@@ -368,6 +371,28 @@ export default {
       })
     },
 
+    //查询商品
+    querryGoods() {
+      this.$axios.get('/goods', {
+        params: {
+          id: this.query.id,
+          categoryId: this.query.categoryId[1],
+          status: this.query.status,
+          pageNum: this.pageNum,
+          pageSize: this.pageSize,
+          sid: parseInt(localStorage.getItem('sid'))
+        }
+      }).then((response) => {
+        this.total = response.data.data.total;
+        this.goodsList = response.data.data.list;
+        console.log(this.goodsList)
+        if (this.goodsList.length === 0) {
+          this.showEmpty = true
+        }
+      }).catch((error) => {
+        console.log(error)
+      })
+    },
     // 删除商品
     deleteGoods(row) {
       this.$axios.delete('/goods/delete', {
@@ -410,10 +435,9 @@ export default {
     empty() {
       this.goods.id = ''
       this.goods.categoryId = ''
-      this.goods.title = ''
       this.goods.name = ''
       this.goods.price = ''
-      this.goods.quantity = ''
+      this.goods.sales = ''
       this.goods.picture = ''
       this.goods.remark = ''
       this.goods.status = ''
