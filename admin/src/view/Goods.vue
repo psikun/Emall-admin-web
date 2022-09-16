@@ -5,14 +5,17 @@
       <el-form-item prop="id">
         <el-input v-model.number="query.id" placeholder="商品ID"/>
       </el-form-item>
+      <el-form-item prop="id">
+        <el-input v-model.number="query.name" placeholder="商品名称"/>
+      </el-form-item>
       <el-form-item prop="status">
         <el-select v-model="query.status" placeholder="商品状态">
-          <el-option label="已上架" value="1"></el-option>
-          <el-option label="未上架" value="2"></el-option>
+          <el-option label="已上架" value="0"></el-option>
+          <el-option label="未上架" value="1"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" :icon="Search" @click="getGoodsList">查询</el-button>
+        <el-button type="primary" :icon="Search" @click="searchGoods">查询</el-button>
         <el-button type="primary" :icon="Brush" @click="resetForm('query')"/>
         <el-button type="primary" :icon="Plus" @click="add">商品</el-button>
       </el-form-item>
@@ -98,11 +101,11 @@
               @change="addCatagory"
               clearable>
             <el-option
-              v-for="item in option"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-              >
+                v-for="item in option"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+            >
             </el-option>
           </el-select>
         </el-form-item>
@@ -156,7 +159,7 @@ export default {
       // 查询条件
       query: {
         id: '',
-        categoryId: '',
+        name: '',
         status: ''
       },
 
@@ -165,12 +168,12 @@ export default {
 
       option: [
         {
-          value:"01",
-          label:"一级父类",
+          value: "01",
+          label: "一级父类",
         },
         {
-          value:"02",
-          label:"二级父类"
+          value: "02",
+          label: "二级父类"
         }
       ],
 
@@ -287,16 +290,13 @@ export default {
     },
 
 
-    addCatagory(){
-      console.log("种类:",this.goods.categoryId);
+    addCatagory() {
+      console.log("种类:", this.goods.categoryId);
     },
     // 获取商品列表
     getGoodsList() {
       this.$axios.get('/goods', {
         params: {
-          id: this.query.id,
-          categoryId: this.query.categoryId[1],
-          status: this.query.status,
           pageNum: this.pageNum,
           pageSize: this.pageSize,
           sid: parseInt(localStorage.getItem('sid'))
@@ -372,27 +372,27 @@ export default {
     },
 
     //查询商品
-    querryGoods() {
-      this.$axios.get('/goods', {
-        params: {
-          id: this.query.id,
-          categoryId: this.query.categoryId[1],
-          status: this.query.status,
-          pageNum: this.pageNum,
-          pageSize: this.pageSize,
-          sid: parseInt(localStorage.getItem('sid'))
-        }
-      }).then((response) => {
-        this.total = response.data.data.total;
-        this.goodsList = response.data.data.list;
-        console.log(this.goodsList)
-        if (this.goodsList.length === 0) {
-          this.showEmpty = true
-        }
-      }).catch((error) => {
-        console.log(error)
-      })
-    },
+    // querryGoods() {
+    //   this.$axios.get('/goods', {
+    //     params: {
+    //       id: this.query.id,
+    //       categoryId: this.query.categoryId[1],
+    //       status: this.query.status,
+    //       pageNum: this.pageNum,
+    //       pageSize: this.pageSize,
+    //       sid: parseInt(localStorage.getItem('sid'))
+    //     }
+    //   }).then((response) => {
+    //     this.total = response.data.data.total;
+    //     this.goodsList = response.data.data.list;
+    //     console.log(this.goodsList)
+    //     if (this.goodsList.length === 0) {
+    //       this.showEmpty = true
+    //     }
+    //   }).catch((error) => {
+    //     console.log(error)
+    //   })
+    // },
     // 删除商品
     deleteGoods(row) {
       this.$axios.delete('/goods/delete', {
@@ -443,6 +443,24 @@ export default {
       this.goods.status = ''
       this.operateType = ''
       this.pictureList = []
+    },
+    searchGoods() {
+      this.$axios.post('/goods/search', {
+          id: this.query.id,
+          deleted: this.query.status,
+          name:this.query.name,
+          pageNum: this.pageNum,
+          pageSize: this.pageSize,
+      }).then((response) => {
+        this.total = response.data.data.total;
+        this.goodsList = response.data.data.list;
+        console.log(this.goodsList)
+        if (this.goodsList.length === 0) {
+          this.showEmpty = true
+        }
+      }).catch((error) => {
+        console.log(error)
+      })
     },
 
   }
