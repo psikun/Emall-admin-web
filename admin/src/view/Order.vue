@@ -19,27 +19,34 @@
         <el-button type="primary" :icon="Brush" @click="resetForm"/>
       </el-form-item>
     </el-form>
-    <!-- 订单列表 -->
+    <!-- 订单列表 ---------------------------------------------------------------------------------------->
     <el-table :data="orderList" height="65vh" style="width: 100%">
       <el-table-column prop="id" label="订单号" width="200px"/>
-      <el-table-column prop="totalPrice" label="订单金额"/>
-      <el-table-column prop="goodsCount" label="商品数量">
-        <template #default="scope">x{{scope.row.goodsCount}}</template>
-      </el-table-column>
+      <el-table-column prop="payment" label="订单金额"/>
+      <el-table-column prop="freight" label="订单运费"/>
+
       <el-table-column prop="status" label="订单状态">
         <template #default="scope">
-          <el-tag v-if="scope.row.status === 1" size="small" type="info">待付款</el-tag>
+          <el-tag v-if="scope.row.status === 1" size="small" type="warning">待付款</el-tag>
           <el-tag v-if="scope.row.status === 2" size="small" type="info">已取消</el-tag>
-          <el-tag v-if="scope.row.status === 3" size="small" type="info">已付款</el-tag>
+          <el-tag v-if="scope.row.status === 3" size="small" type="success">已付款</el-tag>
           <el-tag v-if="scope.row.status === 4" size="small" type="primary">配送中</el-tag>
           <el-tag v-if="scope.row.status === 5" size="small" type="success">已完成</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="created" label="创建时间" min-width="150" sortable>
+      <el-table-column prop="createTime" label="支付时间" min-width="150" sortable>
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <el-icon><timer/></el-icon>
-            <span style="margin-left: 10px">{{ scope.row.created }}</span>
+            <span style="margin-left: 10px">{{ scope.row.createTime }}</span>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column prop="createTime" label="发货时间" min-width="150" sortable>
+        <template #default="scope">
+          <div style="display: flex; align-items: center">
+            <el-icon><timer/></el-icon>
+            <span style="margin-left: 10px">{{ scope.row.createTime }}</span>
           </div>
         </template>
       </el-table-column>
@@ -86,30 +93,11 @@
         <el-tag v-if="orderDetail.status === 5" size="small" type="success">已完成</el-tag>
       </descriptions>
       <descriptions label="支付金额">{{orderDetail.totalPrice}}</descriptions>
-      <descriptions label="商品列表">
-        <el-table :data="orderDetail.goodsItem" style="width: 100%">
-          <el-table-column prop="name" label="主图" width="60">
-            <template #default="scope">
-              <div style="display: flex;justify-content: center;align-items: center;">
-                <el-image class="goods_image" :src="scope.row.imageUrl"/>
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column prop="title" label="标题">
-            <template #default="scope">
-              <div style="font-size: 10px;line-height: 15px;">{{scope.row.title}}</div>
-            </template>
-          </el-table-column>
-          <el-table-column prop="count" label="数量" width="80">
-            <template #default="scope">x {{scope.row.count}}</template>
-          </el-table-column>
-        </el-table>
-      </descriptions>
       <descriptions label="收货人姓名">{{orderDetail.name}}</descriptions>
       <descriptions label="手机号">{{orderDetail.mobile}}</descriptions>
-      <descriptions label="收货地址">{{orderDetail.province + ' ' + orderDetail.city + ' ' + orderDetail.district +
-      ' ' + orderDetail.detailedAddress }}</descriptions>
-      <descriptions label="创建时间">{{orderDetail.created}}</descriptions>
+      <descriptions label="收货地址">{{orderDetail.address }}</descriptions>
+      <descriptions label="支付时间">{{orderDetail.paymentTime}}</descriptions>
+      <descriptions label="发货时间">{{orderDetail.deliveryTime}}</descriptions>
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" @click="orderDialogVisible = false">确定</el-button>
@@ -143,21 +131,19 @@ export default {
       },
       query: {
         id: '',
-        status: ''
+        status: '',
+        payment: ''
       },
       orderDetail: {
         id: '',
         status: '',
         totalPrice: '',
-        goodsItem: [],
         name: '',
         mobile: '',
-        province: '',
-        city: '',
-        district: '',
-        detailedAddress: '',
+        address: '',
         createTime: '',
-        nickName: ''
+        paymentTime: '',
+        deliveryTime: ''
       },
       dialogTitle: '',
       operateType: '',
@@ -217,20 +203,16 @@ export default {
       this.orderDetail.nickName = row.nickName
       console.log(row.id)
       this.dialogTitle = '订单详情'
-      this.$axios.get('/order/detail', {
-        params: { id: row.id }
+      this.$axios.get('/order/'+row.id, {
       }).then((response) => {
-        this.orderDetail.id = response.data.data.id
-        this.orderDetail.status = response.data.data.status
-        this.orderDetail.totalPrice = response.data.data.totalPrice
-        this.orderDetail.goodsItem = response.data.data.goodsItem
-        this.orderDetail.name = response.data.data.name
-        this.orderDetail.mobile = response.data.data.mobile
-        this.orderDetail.province = response.data.data.province
-        this.orderDetail.city = response.data.data.city
-        this.orderDetail.district = response.data.data.district
-        this.orderDetail.detailedAddress = response.data.data.detailedAddress
-        this.orderDetail.created = response.data.data.created
+        this.orderDetail.id = response.data.data.order.id
+        this.orderDetail.status = response.data.data.order.status
+        this.orderDetail.totalPrice = response.data.data.order.payment
+        this.orderDetail.name = response.data.data.address.recipient
+        this.orderDetail.mobile = response.data.data.address.phone
+        this.orderDetail.address = response.data.data.address.address
+        this.orderDetail.paymentTime = response.data.data.order.paymentTime
+        this.orderDetail.deliveryTime= response.data.data.order.deliveryTime
       }).catch((error) => {
         console.log(error)
       })
