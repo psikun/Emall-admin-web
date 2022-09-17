@@ -5,6 +5,9 @@
       <el-form-item prop="id">
         <el-input v-model.number="query.id" placeholder="订单ID"/>
       </el-form-item>
+      <el-form-item prop="userId">
+        <el-input v-model.number="query.userId" placeholder="用户ID"/>
+      </el-form-item>
       <el-form-item prop="status">
         <el-select v-model="query.status" placeholder="订单状态">
           <el-option label="待付款" value="1"></el-option>
@@ -15,16 +18,16 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" :icon="Search" @click="getOrderList">查询</el-button>
+        <el-button type="primary" :icon="Search" @click="searchOrder">查询</el-button>
         <el-button type="primary" :icon="Brush" @click="resetForm"/>
       </el-form-item>
     </el-form>
     <!-- 订单列表 ---------------------------------------------------------------------------------------->
     <el-table :data="orderList" height="65vh" style="width: 100%">
       <el-table-column prop="id" label="订单号" width="200px"/>
+      <el-table-column prop="userId"  label="用户ID"></el-table-column>
       <el-table-column prop="payment" label="订单金额"/>
       <el-table-column prop="freight" label="订单运费"/>
-
       <el-table-column prop="status" label="订单状态">
         <template #default="scope">
           <el-tag v-if="scope.row.status === 1" size="small" type="warning">待付款</el-tag>
@@ -132,6 +135,7 @@ export default {
       query: {
         id: '',
         status: '',
+        userId: '',
         payment: ''
       },
       orderDetail: {
@@ -187,6 +191,23 @@ export default {
           pageSize: this.pageSize,
           sid: parseInt(localStorage.getItem('sid'))
         }
+      }).then((response) => {
+        this.total = response.data.data.total
+        this.orderList = response.data.data.list
+        if (this.orderList.length === 0) {
+          this.showEmpty = true
+        }
+      }).catch((error) => {
+        console.log(error)
+      })
+    },
+    searchOrder(){
+      this.$axios.post('/order/search', {
+        id: this.query.id,
+        status: this.query.status,
+        userId :this.query.userId,
+        pageNum: this.query.pageNum,
+        pageSize: this.query.pageSize,
       }).then((response) => {
         this.total = response.data.data.total
         this.orderList = response.data.data.list
