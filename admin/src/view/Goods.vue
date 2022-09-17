@@ -44,7 +44,13 @@
           <el-tag v-if="scope.row.deleted === 1" size="small" type="success">已下架</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="categoryId" label="类目" sortable/>
+      <el-table-column prop="categoryId" label="类目">
+        <template #default="scope">
+          <el-tag v-if="scope.row.categoryId === 1" size="small">童装</el-tag>
+          <el-tag v-if="scope.row.categoryId === 2" size="small">男装</el-tag>
+          <el-tag v-if="scope.row.categoryId === 3" size="small">女装</el-tag>
+        </template>
+      </el-table-column>
 
       <el-table-column prop="createTime" label="创建时间" min-width="150" sortable>
         <template #default="scope">
@@ -165,15 +171,18 @@ export default {
 
       // 类目选项
       categoryOption: [],
-
       option: [
         {
           value: "01",
-          label: "一级父类",
+          label: "童装",
         },
         {
           value: "02",
-          label: "二级父类"
+          label: "男装",
+        },
+        {
+          value: "03",
+          label: "女装",
         }
       ],
 
@@ -444,6 +453,7 @@ export default {
       this.operateType = ''
       this.pictureList = []
     },
+    //查询商品
     searchGoods() {
       this.$axios.post('/goods/search', {
           id: this.query.id,
