@@ -89,7 +89,7 @@ export default {
             localStorage.setItem("token", response.data.data.token)
             localStorage.setItem("sid", response.data.data.user)
             ElMessage({ message: '欢迎回来'+response.data.data.user, type: 'success'})
-            this.$router.push('/category');
+            this.$router.push('/index');
           }).catch((error) => {
             console.log(error);
           })

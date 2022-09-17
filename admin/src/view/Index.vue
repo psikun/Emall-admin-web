@@ -51,7 +51,7 @@
                   </links>
                 </el-col>
                 <el-col :span="6">
-                  <links title="活动管理" bgColor="#95d475" to="market"
+                  <links title="会员管理" bgColor="#95d475" to="member"
                   >
                     <ShoppingCart
                     />

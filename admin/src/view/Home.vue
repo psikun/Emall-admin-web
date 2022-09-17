@@ -17,8 +17,8 @@
     <el-menu-item index="/order" @click="changeNav(this.order)">
       <el-icon><list /></el-icon><span>订单</span>
     </el-menu-item>
-    <el-menu-item index="/market" @click="changeNav(this.market)">
-      <el-icon><ticket /></el-icon><span>营销</span>
+    <el-menu-item index="/member" @click="changeNav(this.market)">
+      <el-icon><ticket /></el-icon><span>会员</span>
     </el-menu-item>
   </el-menu>
     </el-aside>
@@ -109,8 +109,8 @@ export default {
         index: '/order',
       }],
       market: [{
-        name: '活动管理',
-        index: '/market',
+        name: '会员管理',
+        index: '/member',
       }]
     }
   },

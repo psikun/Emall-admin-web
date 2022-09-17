@@ -5,8 +5,8 @@ import Index from "../view/Index";
 import Goods from "../view/Goods";
 import Category from "../view/Category";
 import Order from "../view/Order";
-import Market from "../view/Market";
 import Error from "../view/Error";
+import Member from "@/view/Member";
 
 const routes = [
     {
@@ -39,9 +39,9 @@ const routes = [
                 component: Order,
             },
             {
-                path: '/market',
-                name: 'market',
-                component: Market,
+                path: '/member',
+                name: 'member',
+                component: Member,
             }
         ],
     },

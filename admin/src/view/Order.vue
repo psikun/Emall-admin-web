@@ -25,7 +25,11 @@
     <!-- 订单列表 ---------------------------------------------------------------------------------------->
     <el-table :data="orderList" height="65vh" style="width: 100%">
       <el-table-column prop="id" label="订单号" width="200px"/>
-      <el-table-column prop="userId"  label="用户ID"></el-table-column>
+      <el-table-column label="用户ID">
+        <template #default="scope">
+          <span>{{ scope.row.userId }}</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="payment" label="订单金额"/>
       <el-table-column prop="freight" label="订单运费"/>
       <el-table-column prop="status" label="订单状态">
@@ -40,7 +44,9 @@
       <el-table-column prop="createTime" label="支付时间" min-width="150" sortable>
         <template #default="scope">
           <div style="display: flex; align-items: center">
-            <el-icon><timer/></el-icon>
+            <el-icon>
+              <timer/>
+            </el-icon>
             <span style="margin-left: 10px">{{ scope.row.createTime }}</span>
           </div>
         </template>
@@ -48,7 +54,9 @@
       <el-table-column prop="createTime" label="发货时间" min-width="150" sortable>
         <template #default="scope">
           <div style="display: flex; align-items: center">
-            <el-icon><timer/></el-icon>
+            <el-icon>
+              <timer/>
+            </el-icon>
             <span style="margin-left: 10px">{{ scope.row.createTime }}</span>
           </div>
         </template>
@@ -56,7 +64,8 @@
       <el-table-column label="操作" min-width="130">
         <template #default="scope">
           <el-button size="small" @click="checkOrder(scope.$index, scope.row)">详情</el-button>
-          <el-button v-if="scope.row.status === 3" size="small" type="primary" @click="modifyOrder(scope.row, 4)">配送</el-button>
+          <el-button v-if="scope.row.status === 3" size="small" type="primary" @click="modifyOrder(scope.row, 4)">配送
+          </el-button>
           <el-popconfirm title="此操作将永久删除该信息, 是否继续?"
                          confirmButtonText="确认"
                          cancelButtonText="取消"
@@ -65,29 +74,29 @@
                          :icon="WarningFilled"
                          @confirm="deleteOrder(scope.row)">
             <template #reference>
-             <el-button size="small" type="danger">删除</el-button>
+              <el-button size="small" type="danger">删除</el-button>
             </template>
           </el-popconfirm>
         </template>
       </el-table-column>
       <template #empty>
         <div style="margin: 50px 0;">
-          <el-empty  v-if="showEmpty" description="暂时还没有订单哦" />
+          <el-empty v-if="showEmpty" description="暂时还没有订单哦"/>
         </div>
       </template>
     </el-table>
     <div style="padding: 10px 0;">
       <el-pagination layout="total, prev, pager, next"
-                   :current-page="pageNum"
-                   :page-size="pageSize"
-                   :total="total"
-                   @current-change="handleCurrentChange"
-                   @prev-click="handleCurrentChangePrev"
-                   @next-click="handleCurrentChangeNext" background/>
+                     :current-page="pageNum"
+                     :page-size="pageSize"
+                     :total="total"
+                     @current-change="handleCurrentChange"
+                     @prev-click="handleCurrentChangePrev"
+                     @next-click="handleCurrentChangeNext" background/>
     </div>
     <!-- 查看订单详情，对话框 -->
     <el-dialog :title="dialogTitle" v-model="orderDialogVisible" top="5vh" width="50%">
-      <descriptions label="订单编号">{{orderDetail.id}}</descriptions>
+      <descriptions label="订单编号">{{ orderDetail.id }}</descriptions>
       <descriptions label="订单状态">
         <el-tag v-if="orderDetail.status === 1" size="small" type="warning">待付款</el-tag>
         <el-tag v-if="orderDetail.status === 2" size="small" type="info">已取消</el-tag>
@@ -95,12 +104,12 @@
         <el-tag v-if="orderDetail.status === 4" size="small" type="primary">配送中</el-tag>
         <el-tag v-if="orderDetail.status === 5" size="small" type="success">已完成</el-tag>
       </descriptions>
-      <descriptions label="支付金额">{{orderDetail.totalPrice}}</descriptions>
-      <descriptions label="收货人姓名">{{orderDetail.name}}</descriptions>
-      <descriptions label="手机号">{{orderDetail.mobile}}</descriptions>
-      <descriptions label="收货地址">{{orderDetail.address }}</descriptions>
-      <descriptions label="支付时间">{{orderDetail.paymentTime}}</descriptions>
-      <descriptions label="发货时间">{{orderDetail.deliveryTime}}</descriptions>
+      <descriptions label="支付金额">{{ orderDetail.totalPrice }}</descriptions>
+      <descriptions label="收货人姓名">{{ orderDetail.name }}</descriptions>
+      <descriptions label="手机号">{{ orderDetail.mobile }}</descriptions>
+      <descriptions label="收货地址">{{ orderDetail.address }}</descriptions>
+      <descriptions label="支付时间">{{ orderDetail.paymentTime }}</descriptions>
+      <descriptions label="发货时间">{{ orderDetail.deliveryTime }}</descriptions>
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" @click="orderDialogVisible = false">确定</el-button>
@@ -182,7 +191,7 @@ export default {
     },
 
     // 获取订单列表
-    getOrderList(){
+    getOrderList() {
       this.$axios.get('/order', {
         params: {
           id: this.query.id,
@@ -201,11 +210,11 @@ export default {
         console.log(error)
       })
     },
-    searchOrder(){
+    searchOrder() {
       this.$axios.post('/order/search', {
         id: this.query.id,
         status: this.query.status,
-        userId :this.query.userId,
+        userId: this.query.userId,
         pageNum: this.query.pageNum,
         pageSize: this.query.pageSize,
       }).then((response) => {
@@ -224,8 +233,7 @@ export default {
       this.orderDetail.nickName = row.nickName
       console.log(row.id)
       this.dialogTitle = '订单详情'
-      this.$axios.get('/order/'+row.id, {
-      }).then((response) => {
+      this.$axios.get('/order/' + row.id, {}).then((response) => {
         this.orderDetail.id = response.data.data.order.id
         this.orderDetail.status = response.data.data.order.status
         this.orderDetail.totalPrice = response.data.data.order.payment
@@ -233,7 +241,7 @@ export default {
         this.orderDetail.mobile = response.data.data.address.phone
         this.orderDetail.address = response.data.data.address.address
         this.orderDetail.paymentTime = response.data.data.order.paymentTime
-        this.orderDetail.deliveryTime= response.data.data.order.deliveryTime
+        this.orderDetail.deliveryTime = response.data.data.order.deliveryTime
       }).catch((error) => {
         console.log(error)
       })
@@ -246,7 +254,7 @@ export default {
         id: row.id,
         status: status
       }).then((response) => {
-        if (response.data.code === 200 && status === 4){
+        if (response.data.code === 200 && status === 4) {
           ElMessage({message: '订单配送中', type: 'success'})
         }
         this.getOrderList()
@@ -260,30 +268,41 @@ export default {
     },
 
     // 删除订单
-    deleteOrder(row){
+    deleteOrder(row) {
       this.$axios.delete('/order/delete', {
-          params: {
-            id: row.id
-          }
-        }).then((response) => {
-          if (response.data.code === 200) {
-            ElMessage({message: response.data.message, type: 'success'})
-          }
-          this.getOrderList()
-        }).catch((error) => {
-          console.log(error)
+        params: {
+          id: row.id
+        }
+      }).then((response) => {
+        if (response.data.code === 200) {
+          ElMessage({message: response.data.message, type: 'success'})
+        }
+        this.getOrderList()
+      }).catch((error) => {
+        console.log(error)
       })
-    }
+    },
+    // 获取会员名称
+    getMemberName(row) {
+      console.log(row)
+      this.$axios.get('/Member/' + row.userId).then((response) => {
+        console.log(response.data.data.name)
+       return response.data.data.name
+      }).catch((error) => {
+        console.log(error)
+      })
+    },
   }
 }
 </script>
 
 <style scoped>
-.goods_image{
+.goods_image {
   width: 35px;
   height: 35px;
   border-radius: 5px;
 }
+
 .el-dialog {
   border-radius: 10px !important;
 }
