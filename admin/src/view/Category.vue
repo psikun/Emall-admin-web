@@ -10,7 +10,12 @@
         <el-button type="primary" @click="addLv1Category">添加一级类目</el-button>
       </el-form-item>
     </el-form>
-    <!-- 商品一级类目列表 -->
+    <!-- 商品一级类目列表 --------------------------------------------------------------->
+    <!-- 商品一级类目列表 --------------------------------------------------------------->
+    <!-- 商品一级类目列表 --------------------------------------------------------------->
+    <!-- 商品一级类目列表 --------------------------------------------------------------->
+    <!-- 商品一级类目列表 --------------------------------------------------------------->
+    <!-- 商品一级类目列表 --------------------------------------------------------------->
     <el-table :data="categoryLv1List" height="65vh" style="width: 100%">
       <el-table-column prop="id" label="编号"/>
       <el-table-column prop="name" label="名称"/>
@@ -20,7 +25,7 @@
         <template #default="scope">
           <el-button size="small" type="primary" :icon="Edit" @click="editLv1Category(scope.row)"/>
           <el-button size="small" type="primary" :icon="Plus" @click="addLv2Category(scope.row)"/>
-          <el-button size="small" type="primary" @click="checkLv2Category(scope.row)">查看二级类目</el-button>
+          <el-button size="small" type="primary" @click="getSecondCategory(scope.row)">查看二级类目</el-button>
           <el-popconfirm title="此操作将永久删除该信息, 是否继续?"
                          confirmButtonText="确认"
                          cancelButtonText="取消"
@@ -28,25 +33,25 @@
                          :icon="WarningFilled"
                          @confirm="deleteCategory(scope.row)">
             <template #reference>
-             <el-button size="small" type="danger" :icon="Delete"/>
+              <el-button size="small" type="danger" :icon="Delete"/>
             </template>
           </el-popconfirm>
         </template>
       </el-table-column>
       <template #empty>
         <div style="margin: 50px 0;">
-          <el-empty v-if="showEmpty" description="暂时还没有商品哦" />
+          <el-empty v-if="showEmpty" description="暂时还没有商品哦"/>
         </div>
       </template>
     </el-table>
     <div style="padding: 10px 0;">
       <el-pagination layout="total, prev, pager, next"
-                   :current-page="pageNum"
-                   :page-size="pageSize"
-                   :total="total"
-                   @current-change="handleCurrentChange"
-                   @prev-click="handleCurrentChangePrev"
-                   @next-click="handleCurrentChangeNext" background/>
+                     :current-page="pageNum"
+                     :page-size="pageSize"
+                     :total="total"
+                     @current-change="handleCurrentChange"
+                     @prev-click="handleCurrentChangePrev"
+                     @next-click="handleCurrentChangeNext" background/>
     </div>
     <!-- 添加、编辑商品，通用对话框 -->
     <el-dialog :title="dialogTitle" v-model="categoryDialogVisible" top="30vh" width="35%" @close="cancelCategory">
@@ -54,8 +59,8 @@
         <el-form-item label="名称">
           <el-input v-model="category.name" type="text" maxlength="10" show-word-limit/>
         </el-form-item>
-        <el-form-item label="排序">
-          <el-input v-model.number="category.sort" />
+        <el-form-item label="类目级别">
+          <el-input v-model.number="category.parentId"/>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -76,15 +81,15 @@
           <template #default="scope">
             <el-button size="small" type="primary" :icon="Edit" @click="editLv2Category(scope.row)"/>
             <el-popconfirm title="此操作将永久删除该信息, 是否继续?"
-                         confirmButtonText="确认"
-                         cancelButtonText="取消"
-                         cancelButtonType="default"
-                         :icon="WarningFilled"
-                         @confirm="deleteCategory(scope.row)">
-            <template #reference>
-             <el-button size="small" type="danger" :icon="Delete"/>
-            </template>
-          </el-popconfirm>
+                           confirmButtonText="确认"
+                           cancelButtonText="取消"
+                           cancelButtonType="default"
+                           :icon="WarningFilled"
+                           @confirm="deleteCategory(scope.row)">
+              <template #reference>
+                <el-button size="small" type="danger" :icon="Delete"/>
+              </template>
+            </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>
@@ -152,27 +157,28 @@ export default {
     },
 
     // 添加一级类目
-    addLv1Category(){
-      this.operateType = 'add'
+    addLv1Category() {
+      this.operateType = 'add1'
       this.dialogTitle = '添加一级类目'
       this.category.level = 1
-      this.category.parentId = 1
+      this.category.parentId = 0
       this.categoryDialogVisible = true
     },
 
     // 编辑一级类目
-    editLv1Category(row){
+    editLv1Category(row) {
       this.operateType = 'edit'
       this.dialogTitle = '编辑一级类目'
       this.category.id = row.id
       this.category.name = row.name
       this.category.sort = row.sort
+      this.category.parentId = row.id
       this.categoryDialogVisible = true
     },
 
     // 添加二级类目
-    addLv2Category(row){
-      this.operateType = 'add'
+    addLv2Category(row) {
+      this.operateType = 'add2'
       this.dialogTitle = '添加二级类目'
       this.category.level = 2
       this.category.parentId = row.id
@@ -180,26 +186,36 @@ export default {
     },
 
     // 编辑二级类目
-    editLv2Category(row){
+    editLv2Category(row) {
       this.operateType = 'edit'
       this.dialogTitle = '编辑二级类目'
       this.category.id = row.id
       this.category.name = row.name
       this.category.sort = row.sort
+      this.category.parentId = row.id
       this.categoryDialogVisible = true
     },
 
     // 查看二级类目
-    checkLv2Category(row){
+    checkLv2Category(row) {
       this.dialogTitle = '查看二级类目'
-      this.getCategoryList(row.id)
+      this.getCategoryList2(row.id)
       this.checkLv2CategoryDialogVisible = true
     },
+    getSecondCategory(row) {
+      this.$axios.get('/category/show', {
+            params: {
+              id: row.id
+            }
+          }
+      ).then((response)=>{
+        this.categoryLv2List = response.data.data;
+        this.checkLv2CategoryDialogVisible = true
+      })
 
-
-    // 获取类目列表
-    getCategoryList(parentId){
-      this.$axios.get('/category', {
+    },
+    getCategoryList2(parentId) {
+      this.$axios.get('/category/show', {
         params: {
           name: this.query.name,
           pageNum: 1,
@@ -208,7 +224,7 @@ export default {
           sid: localStorage.getItem('sid')
         }
       }).then((response) => {
-        if (parentId === 1){
+        if (parentId === 1) {
           this.categoryLv1List = response.data.data;
         } else {
           this.categoryLv2List = response.data.data;
@@ -220,11 +236,52 @@ export default {
         console.log(error)
       })
     },
-
+    // 获取类目列表
+    getCategoryList(parentId) {
+      this.$axios.get('/category', {
+        params: {
+          name: this.query.name,
+          pageNum: 1,
+          pageSize: 1,
+          parentId: parentId,
+          sid: localStorage.getItem('sid')
+        }
+      }).then((response) => {
+        if (parentId === 1) {
+          this.categoryLv1List = response.data.data;
+        } else {
+          this.categoryLv2List = response.data.data;
+        }
+        if (this.categoryLv1List.length === 0) {
+          this.showEmpty = true
+        }
+      }).catch((error) => {
+        console.log(error)
+      })
+    },
+    //添加二级类目
+    add() {
+      this.$axios.post('/goods/search', {
+        id: this.query.id,
+        deleted: this.query.status,
+        name: this.query.name,
+        pageNum: this.pageNum,
+        pageSize: this.pageSize,
+      }).then((response) => {
+        this.total = response.data.data.total;
+        this.goodsList = response.data.data.list;
+        console.log(this.goodsList)
+        if (this.goodsList.length === 0) {
+          this.showEmpty = true
+        }
+      }).catch((error) => {
+        console.log(error)
+      })
+    },
     // 确定添加、编辑类目
-    confirmCategory(){
-      if (this.operateType === 'add'){
-        this.$axios.post('/category/add', {
+    confirmCategory() {
+      if (this.operateType === 'add1') {
+        this.$axios.post('/category/add1', {
           name: this.category.name,
           parentId: this.category.parentId,
           level: this.category.level,
@@ -239,7 +296,23 @@ export default {
           console.log(error)
         })
       }
-      if (this.operateType === 'edit'){
+      if (this.operateType === 'add2') {
+        this.$axios.post('/category/add2', {
+          name: this.category.name,
+          parentId: this.category.parentId,
+          level: this.category.level,
+          sort: this.category.sort,
+          sid: localStorage.getItem('sid')
+        }).then((response) => {
+          if (response.data.code === 200) {
+            ElMessage({message: response.data.message, type: 'success'})
+          }
+          this.getCategoryList(1)
+        }).catch((error) => {
+          console.log(error)
+        })
+      }
+      if (this.operateType === 'edit') {
         this.$axios.put('/category/update', {
           id: this.category.id,
           name: this.category.name,
@@ -256,21 +329,21 @@ export default {
       this.categoryDialogVisible = false
       this.checkLv2CategoryDialogVisible = false
     },
-    deleteCategory(row){
+    deleteCategory(row) {
       this.$axios.delete('/category/delete', {
-          params: {
-            id: row.id
-          }
-        }).then((response) => {
-          if (response.data.code === 200) {
-            ElMessage({message: response.data.message, type: 'success'})
-          }
-          this.getCategoryList(1)
-        }).catch((error) => {
-          console.log(error)
+        params: {
+          id: row.id
+        }
+      }).then((response) => {
+        if (response.data.code === 200) {
+          ElMessage({message: response.data.message, type: 'success'})
+        }
+        this.getCategoryList(1)
+      }).catch((error) => {
+        console.log(error)
       })
     },
-    cancelCategory(){
+    cancelCategory() {
       this.categoryDialogVisible = false
       this.emptyCategory()
       this.dialogTitle = ''
@@ -278,7 +351,7 @@ export default {
     },
 
     // 清空类目
-    emptyCategory(){
+    emptyCategory() {
       this.category.id = ''
       this.category.name = ''
       this.category.parentId = ''
