@@ -41,31 +41,29 @@
           <el-tag v-if="scope.row.status === 5" size="small" type="success">已完成</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="createTime" label="支付时间" min-width="150" sortable>
+      <el-table-column prop="paymentTime" label="支付时间" min-width="150" sortable>
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <el-icon>
               <timer/>
             </el-icon>
-            <span style="margin-left: 10px">{{ scope.row.createTime }}</span>
+            <span style="margin-left: 10px">{{ scope.row.paymentTime }}</span>
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="createTime" label="发货时间" min-width="150" sortable>
+      <el-table-column prop="deliveryTime" label="发货时间" min-width="150" sortable>
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <el-icon>
               <timer/>
             </el-icon>
-            <span style="margin-left: 10px">{{ scope.row.createTime }}</span>
+            <span style="margin-left: 10px">{{ scope.row.deliveryTime }}</span>
           </div>
         </template>
       </el-table-column>
       <el-table-column label="操作" min-width="130">
         <template #default="scope">
           <el-button size="small" @click="checkOrder(scope.$index, scope.row)">详情</el-button>
-          <el-button v-if="scope.row.status === 3" size="small" type="primary" @click="modifyOrder(scope.row, 4)">配送
-          </el-button>
           <el-popconfirm title="此操作将永久删除该信息, 是否继续?"
                          confirmButtonText="确认"
                          cancelButtonText="取消"
@@ -203,6 +201,7 @@ export default {
       }).then((response) => {
         this.total = response.data.data.total
         this.orderList = response.data.data.list
+        console.log(this.orderList)
         if (this.orderList.length === 0) {
           this.showEmpty = true
         }
@@ -287,7 +286,7 @@ export default {
       console.log(row)
       this.$axios.get('/Member/' + row.userId).then((response) => {
         console.log(response.data.data.name)
-       return response.data.data.name
+        return response.data.data.name
       }).catch((error) => {
         console.log(error)
       })

@@ -11,11 +11,6 @@
       </el-form-item>
     </el-form>
     <!-- 商品一级类目列表 --------------------------------------------------------------->
-    <!-- 商品一级类目列表 --------------------------------------------------------------->
-    <!-- 商品一级类目列表 --------------------------------------------------------------->
-    <!-- 商品一级类目列表 --------------------------------------------------------------->
-    <!-- 商品一级类目列表 --------------------------------------------------------------->
-    <!-- 商品一级类目列表 --------------------------------------------------------------->
     <el-table :data="categoryLv1List" height="65vh" style="width: 100%">
       <el-table-column prop="id" label="编号"/>
       <el-table-column prop="name" label="名称"/>
@@ -137,7 +132,7 @@ export default {
     }
   },
   mounted() {
-    this.getCategoryList(1)
+    this.getCategoryList(0)
   },
   methods: {
 
@@ -208,7 +203,7 @@ export default {
               id: row.id
             }
           }
-      ).then((response)=>{
+      ).then((response) => {
         this.categoryLv2List = response.data.data;
         this.checkLv2CategoryDialogVisible = true
       })
@@ -224,11 +219,9 @@ export default {
           sid: localStorage.getItem('sid')
         }
       }).then((response) => {
-        if (parentId === 1) {
-          this.categoryLv1List = response.data.data;
-        } else {
-          this.categoryLv2List = response.data.data;
-        }
+
+        this.categoryLv2List = response.data.data;
+
         if (this.categoryLv1List.length === 0) {
           this.showEmpty = true
         }
@@ -247,7 +240,8 @@ export default {
           sid: localStorage.getItem('sid')
         }
       }).then((response) => {
-        if (parentId === 1) {
+        console.log(response)
+        if (parentId === 0) {
           this.categoryLv1List = response.data.data;
         } else {
           this.categoryLv2List = response.data.data;
